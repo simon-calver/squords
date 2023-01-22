@@ -5,7 +5,7 @@ export default class menuScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.html('instructions', 'word-game/assets/text/instructions.html');
+    this.load.html('instructions', 'assets/text/instructions.html');
   }
 
   create(data = { mainScene: Phaser.Scene, menuType: String }) {

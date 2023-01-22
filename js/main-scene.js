@@ -20,37 +20,55 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.bitmapFont('main-font', `word-game/assets/fonts/mont-heavy/mont-heavy.png`, `word-game/assets/fonts/mont-heavy/mont-heavy.xml`);
+    this.load.bitmapFont('main-font', `assets/fonts/mont-heavy/mont-heavy.png`, `assets/fonts/mont-heavy/mont-heavy.xml`);
 
-    this.load.image('border-tile', 'word-game/assets/images/border-tile.png');
-    this.load.image('grid-tile', 'word-game/assets/images/grid-tile.png');
-    this.load.image('letter-tile', 'word-game/assets/images/letter-tile.png');
+    this.load.image('border-tile', 'assets/images/border-tile.png');
+    this.load.image('grid-tile', 'assets/images/grid-tile.png');
+    this.load.image('letter-tile', 'assets/images/letter-tile.png');
 
-    this.load.image('menu-top', 'word-game/assets/images/menu-top.png');
-    this.load.image('menu-middle', 'word-game/assets/images/menu-middle.png');
+    this.load.image('menu-top', 'assets/images/menu-top.png');
+    this.load.image('menu-middle', 'assets/images/menu-middle.png');
 
-    this.load.image('tab-line', 'word-game/assets/images/tab-line.png');
+    this.load.image('tab-line', 'assets/images/tab-line.png');
 
-    this.load.image('button', 'word-game/assets/images/button.png');
+    this.load.image('button', 'assets/images/button.png');
 
-    this.load.image('gear', 'word-game/assets/images/icons/gear.png');
-    this.load.image('star', 'word-game/assets/images/icons/star.png');
-    this.load.image('cross', 'word-game/assets/images/icons/cross.png');
-    this.load.image('question', 'word-game/assets/images/icons/question.png');
+    this.load.image('gear', 'assets/images/icons/gear.png');
+    this.load.image('star', 'assets/images/icons/star.png');
+    this.load.image('cross', 'assets/images/icons/cross.png');
+    this.load.image('question', 'assets/images/icons/question.png');
 
-    this.load.text('words', 'word-game/assets/text/word-list.txt');
-    this.load.text('bad-words', 'word-game/assets/text/profanity-list.txt');
+    this.load.text('words', 'assets/text/word-list.txt');
+    this.load.text('bad-words', 'assets/text/profanity-list.txt');
   }
 
   create() {
-    this.input.setDefaultCursor('url(word-game/assets/cursors/hand.cur), pointer');
+    document.getElementById('instructions').addEventListener('click', () =>
+      this.launchMenuScene('MenuScene', 'how_to_play')
+    );
+    document.getElementById('stats').addEventListener('click', () =>
+      this.launchMenuScene('MenuScene', 'stats')
+    );
+
+    // stop from being interactive when menu has been clicked
+    // TODO how reliable is this?
+    document.getElementById('menu').addEventListener('click', function () {
+      var x = document.getElementById("menu-items");
+      if (x.style.display === "block") {
+        this.scene.pause()
+      } else {
+        this.scene.resume()
+      }
+    }.bind(this));
+
+    this.input.setDefaultCursor('url(assets/cursors/hand.cur), pointer');
 
     // Use cumulative probability to choose letters, could define this as const at the top
     this.cumulativeProbability = PROBABILITY.map((sum => value => sum += value)(0));
 
     let { width, height } = this.sys.game.canvas;
     const menuTabHeight = 40;
-    this.addMenuBar(width, menuTabHeight);
+    // this.addMenuBar(width, menuTabHeight);
 
     this.tilesWithLetters = 0;
 
@@ -169,7 +187,7 @@ export default class MainScene extends Phaser.Scene {
         let tile = new GridCell(this, startX + i * 1.05 * cellWidth, startY + j * 1.05 * cellWidth, cellWidth);
 
         tile.on('pointerdown', () => {
-          this.input.setDefaultCursor('url(word-game/assets/cursors/hand-dark.cur), pointer');
+          this.input.setDefaultCursor('url(assets/cursors/hand-dark.cur), pointer');
 
           if (!tile.isLocked) {
             this.placeTile(tile);
@@ -208,7 +226,7 @@ export default class MainScene extends Phaser.Scene {
           this.time.addEvent({
             delay: 200,
             callback: () => {
-              this.input.setDefaultCursor('url(word-game/assets/cursors/hand.cur), pointer');
+              this.input.setDefaultCursor('url(assets/cursors/hand.cur), pointer');
             }
           });
 
