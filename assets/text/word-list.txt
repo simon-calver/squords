@@ -2299,6 +2299,7 @@ farad
 farce
 fare
 fared
+farer
 fares
 farm
 farms
