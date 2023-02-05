@@ -21,7 +21,7 @@ export default class GameOverScene extends Phaser.Scene {
     buttonBackground.displayWidth = 0.8 * width;
     buttonBackground.displayHeight = 60;
 
-    let retryText = this.add.bitmapText(width / 2, height / 4 + 132, 'main-font', 'Play Again', 30).setOrigin(0.5).setInteractive();
+    let retryText = this.add.bitmapText(width / 2, height / 4 + 132, 'main-font', 'Play Again', 30).setOrigin(0.5).setInteractive({ cursor: 'pointer' });
 
     retryText.on('pointerdown', () => {
       data.mainScene.restart();

@@ -2201,7 +2201,6 @@ espy
 essay
 ester
 etas
-etc
 etch
 ether
 ethic

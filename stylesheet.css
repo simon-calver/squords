@@ -10,7 +10,6 @@
 body {
   margin: 0;
   overflow: hidden;
-  /* background-color: black; */
   background: linear-gradient(to right, rgb(50, 50, 50), black, black, black, black, black, rgb(50, 50, 50));
   font-family: 'mont-heavy';
 }
@@ -43,6 +42,7 @@ nav li:last-child {
 
 nav a.instructions {
   background-image: url(assets/images/icons/question.png);
+  background-size: 50px 50px;
   width: 50px;
   height: 50px;
   display: block;
@@ -50,13 +50,7 @@ nav a.instructions {
 
 nav a.stats {
   background-image: url(assets/images/icons/star.png);
-  width: 50px;
-  height: 50px;
-  display: block;
-}
-
-nav a.leaderboard {
-  background-image: url(assets/images/icons/leaderboardsComplex.png);
+  background-size: 50px 50px;
   width: 50px;
   height: 50px;
   display: block;
@@ -65,14 +59,8 @@ nav a.leaderboard {
 .menu {
   cursor: pointer;
   display: block;
+  margin-bottom: 8px;
 }
-
-/* nav a.menu {
-  background-image: url(assets/images/icons/barsHorizontal.png);
-  width: 50px;
-  height: 50px;
-  display: block;
-} */
 
 .menu-items {
   position: absolute;
@@ -116,7 +104,7 @@ nav a.leaderboard {
 .bar2,
 .bar3 {
   width: 35px;
-  height: 7px;
+  height: 6px;
   background-color: white;
   margin: 6px 0px;
   transition: 0.4s;
@@ -124,7 +112,9 @@ nav a.leaderboard {
 
 /* Rotate first bar */
 .change .bar1 {
-  transform: translate(0, 12.5px) rotate(-45deg);
+  transform: translate(0, 13.5px) rotate(-45deg);
+  height: 9px;
+  clip-path: polygon(88% 0%, 100% 50%, 88% 100%, 12% 100%, 0 50%, 12% 0);
 }
 
 /* Fade out the second bar */
@@ -134,37 +124,96 @@ nav a.leaderboard {
 
 /* Rotate last bar */
 .change .bar3 {
-  transform: translate(0, -12.5px) rotate(45deg);
+  transform: translate(0, -13.5px) rotate(45deg);
+  height: 9px;
+  clip-path: polygon(88% 0%, 100% 50%, 88% 100%, 12% 100%, 0 50%, 12% 0);
 }
 
 .game-instructions {
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* flex-wrap: wrap; */
-  /* row-gap: 10px; */
-  /* align-items: center; */
   color: white;
   font-family: 'mont-heavy';
-  /* text-align: left; */
   font-size: 20px;
   margin-left: 20px;
   margin-right: 20px;
   overflow-y: auto;
-  height: 500px;
-  /* align-items: center; */
+  height: 480px;
 }
 
-/* img {
-  margin: auto;
-  display: block;
-  width: 250px;
-  height: auto
-} */
+table.scores,
+table.scores th,
+table.scores td {
+  text-align: left;
+  font-size: 20px;
+  border: none;
+}
 
-/* #instructions input {
-  display: block;
-} */
+table.scores th {
+  position: sticky;
+  top: 0;
+  background: rgb(31, 30, 30);
+  height: 30px;
+}
 
+table.scores {
+  table-layout: fixed;
+  width: 100%;
+  border: none;
+}
+
+#form-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  column-gap: 20px;
+  align-items: center;
+}
+
+#form-wrapper input {
+  display: block;
+}
+
+input[type=text] {
+  width: 200px;
+  font-family: 'mont-heavy';
+  font-size: 30px;
+  text-align: center;
+  color: rgb(255, 255, 255);
+  background-color: rgb(31, 30, 30);
+}
+
+input[type=button] {
+  font-family: 'mont-light';
+  background-color: rgb(31, 30, 30);
+}
+
+.smallButton {
+  width: 100px;
+  font-size: 26px;
+}
+
+.bigButton {
+  width: 120px;
+  font-size: 30px;
+  color: rgb(255, 255, 255);
+}
+
+/* Use this to shake input when text is invalid */
+.error {
+  position: relative;
+  animation: shake .1s linear;
+  animation-iteration-count: 3;
+}
+
+@keyframes shake {
+  0% {
+    left: -5px;
+  }
+
+  100% {
+    right: -5px;
+  }
+}
 
 /* Designing for scroll-bar */
 ::-webkit-scrollbar {

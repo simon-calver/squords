@@ -21,7 +21,7 @@ export default class menuScene extends Phaser.Scene {
     backgroundBottom.flipY = true;
 
     // Button to return to game
-    let cancelButton = this.add.sprite(width - 4, 120, 'cross').setOrigin(1, 0).setScale(0.4).setInteractive();
+    let cancelButton = this.add.sprite(width - 4, startY + 4, 'cross').setOrigin(1, 0).setScale(0.4).setInteractive({ cursor: 'pointer' });
     cancelButton.on('pointerdown', () => {
       data.mainScene.resume('MainScene');
       data.mainScene.resume('GameOverScene');
@@ -33,7 +33,7 @@ export default class menuScene extends Phaser.Scene {
     let title = titleWords.map((word) => {
       return (word.length > 2) ? (word[0].toUpperCase() + word.substring(1)) : (word);
     }).join(' ');
-    this.add.bitmapText(width / 2, 134, 'main-font', title, 36).setOrigin(0.5, 0);
+    this.add.bitmapText(width / 2, startY + 18, 'main-font', title, 36).setOrigin(0.5, 0);
 
     this.setBodyText(data.menuType);
   }
@@ -43,12 +43,12 @@ export default class menuScene extends Phaser.Scene {
     let middleHeight;
     switch (menuType) {
       case 'how_to_play':
-        startY = 116;
+        startY = 0;
         middleHeight = 480;
         break;
       case 'settings': case 'stats':
-        startY = 116;
-        middleHeight = 216;
+        startY = 0;
+        middleHeight = 480;
         break;
     }
     return { startY, middleHeight };
@@ -56,9 +56,11 @@ export default class menuScene extends Phaser.Scene {
 
   setBodyText(menuType) {
     let { width, height } = this.sys.game.canvas;
+    let { startY, middleHeight } = this.getSize(menuType);
+
     switch (menuType) {
       case 'how_to_play':
-        var element = this.add.dom(width / 2, 182).createFromCache('instructions').setOrigin(0.5, 0);
+        var element = this.add.dom(width / 2, startY + 66).createFromCache('instructions').setOrigin(0.5, 0);
         element.addListener('click');
         element.on('click', function (event) {
           console.log("CICK")

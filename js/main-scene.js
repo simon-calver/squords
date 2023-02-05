@@ -3,15 +3,11 @@ const PROBABILITY = [0.077, 0.02, 0.04, 0.038, 0.11, 0.013, 0.029, 0.023, 0.082,
 const WORD_SCORE = [0, 0, 1, 2, 3, 5]; // Index is length of word, value is score
 
 const TILE_COLOURS = [
-  0xa4a4a4, // 0x848484, //0xF29B0D, //0x280df2,//0xff00ff,// 0xff7aff, // blank colour
-  0x0d64f2, //0x0000ff, //0x0000ac //          // letter tile colour
+  0xa4a4a4, // blank colour
+  0x0d64f2, // letter tile colour
 ];
 
-const DETAIL_COLOUR = 0xa4a4a4;  // TILE_COLOURS[0];
-const TILE_COLOUR = 0x0d64f2;
 const BACKGROUND_COLOUR = 0x000000;
-
-// import MenuType from './menu-type';
 
 export default class MainScene extends Phaser.Scene {
 
@@ -29,11 +25,8 @@ export default class MainScene extends Phaser.Scene {
     this.load.image('menu-top', 'assets/images/menu-top.png');
     this.load.image('menu-middle', 'assets/images/menu-middle.png');
 
-    this.load.image('tab-line', 'assets/images/tab-line.png');
-
     this.load.image('button', 'assets/images/button.png');
 
-    this.load.image('gear', 'assets/images/icons/gear.png');
     this.load.image('star', 'assets/images/icons/star.png');
     this.load.image('cross', 'assets/images/icons/cross.png');
     this.load.image('question', 'assets/images/icons/question.png');
@@ -43,44 +36,40 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    let { width, height } = this.sys.game.canvas;
+
     document.getElementById('instructions').addEventListener('click', () =>
       this.launchMenuScene('MenuScene', 'how_to_play')
     );
     document.getElementById('stats').addEventListener('click', () =>
       this.launchMenuScene('MenuScene', 'stats')
     );
-
-    // stop from being interactive when menu has been clicked
-    // TODO how reliable is this?
-    document.getElementById('menu').addEventListener('click', function () {
-      var x = document.getElementById("menu-items");
-      if (x.style.display === "block") {
-        this.scene.pause()
-      } else {
-        this.scene.resume()
-      }
+    document.getElementById('menu').addEventListener('menuOpened', function () {
+      // Use this to stop grid being interactive while drop down menu is in use. Using
+      // this.screenBlocker.input.alwaysEnabled = true; seems not to work when there are
+      // interactive things underneath it, so just use a really low alpha for now!
+      if (this.screenBlocker) this.screenBlocker.destroy();
+      this.screenBlocker = this.add.rectangle(0, 0, width, height, 0x000000).setOrigin(0).setInteractive().setAlpha(0.01);
+      // this.screenBlocker.input.alwaysEnabled = true;
+      // this.screenBlocker.setVisible(false);
     }.bind(this));
-
-    this.input.setDefaultCursor('url(assets/cursors/hand.cur), pointer');
+    document.getElementById('menu').addEventListener('menuClosed', function () {
+      if (this.screenBlocker) this.screenBlocker.destroy();
+    }.bind(this));
 
     // Use cumulative probability to choose letters, could define this as const at the top
     this.cumulativeProbability = PROBABILITY.map((sum => value => sum += value)(0));
 
-    let { width, height } = this.sys.game.canvas;
-    const menuTabHeight = 40;
-    // this.addMenuBar(width, menuTabHeight);
-
     this.tilesWithLetters = 0;
-
     let numberOfLetters = 90;
     this.gridSize = 5;
 
+    const menuTabHeight = 40;
     this.drawGrid(this.gridSize, menuTabHeight);
     this.generateTiles(numberOfLetters);
     this.addNextTileDisplay(menuTabHeight);
 
-
-    this.wordsFound = [] //['ALL', 'WORDS', 'FOUND', 'SHOWN', 'HERE', 'WORD']; //'ss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss', 'fhfhss'];
+    this.wordsFound = [];
     this.wordsFoundBitmap = this.add.bitmapText(width / 2, 100 + menuTabHeight + 1.05 * 60 * this.gridSize, 'main-font', this.wordsFound.join('  '), 18).setOrigin(0.5, 0);
     this.wordsFoundBitmap.setMaxWidth(0.95 * width);
     this.wordsFoundBitmap.setCenterAlign();
@@ -103,22 +92,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.addScoreText(320, 80);
 
-
     this.isGameOver = false;
-  }
-
-  addMenuBar(width, height) {
-    let menuTabBackground = this.add.image(width / 2, height, 'tab-line').setOrigin(0.5, 0).setTint(DETAIL_COLOUR);
-    menuTabBackground.displayWidth = width;
-    menuTabBackground.displayHeight = 2;
-
-    // let settingsIcon = this.add.sprite(width - 10, height / 2, 'gear').setOrigin(1, 0.5).setScale(0.5).setInteractive();
-    let scoreIcon = this.add.sprite(width - 10, height / 2, 'star').setOrigin(1, 0.5).setScale(0.5).setInteractive();
-    let howToPlayIcon = this.add.sprite(10, height / 2, 'question').setOrigin(0, 0.5).setScale(0.5).setInteractive();
-
-    // settingsIcon.on('pointerdown', () => this.launchMenuScene('MenuScene', 'settings'));
-    scoreIcon.on('pointerdown', () => this.launchMenuScene('MenuScene', 'stats'));
-    howToPlayIcon.on('pointerdown', () => this.launchMenuScene('MenuScene', 'how_to_play'))
   }
 
   launchMenuScene(sceneName, menuType) {
@@ -187,8 +161,6 @@ export default class MainScene extends Phaser.Scene {
         let tile = new GridCell(this, startX + i * 1.05 * cellWidth, startY + j * 1.05 * cellWidth, cellWidth);
 
         tile.on('pointerdown', () => {
-          this.input.setDefaultCursor('url(assets/cursors/hand-dark.cur), pointer');
-
           if (!tile.isLocked) {
             this.placeTile(tile);
 
@@ -222,14 +194,6 @@ export default class MainScene extends Phaser.Scene {
               }
             });
           }
-
-          this.time.addEvent({
-            delay: 200,
-            callback: () => {
-              this.input.setDefaultCursor('url(assets/cursors/hand.cur), pointer');
-            }
-          });
-
         });
 
         // Add to array of tiles
@@ -470,9 +434,6 @@ export default class MainScene extends Phaser.Scene {
       });
       this.playerTiles.push(ALPHABET[letterIndex]);
     }
-
-    // this.playerTiles = ['F', 'U', 'C', 'k', 'S'] //'O', 'S', 'Q', 'W', 'T', 'O', 'W', 'R', 'D', 'S']
-
   }
 
   displayCurrentTile() {
@@ -506,7 +467,7 @@ export default class MainScene extends Phaser.Scene {
 
 class GridCell extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, cellSize, fontSize = 36) {
-    super(scene, x, y, 'grid-tile').setOrigin(0.5).setTint(TILE_COLOURS[0]).setInteractive();
+    super(scene, x, y, 'grid-tile').setOrigin(0.5).setTint(TILE_COLOURS[0]).setInteractive({ cursor: 'pointer' });
     scene.add.existing(this);
 
     this.displayHeight = cellSize, this.displayWidth = cellSize;
@@ -535,7 +496,7 @@ class GridCell extends Phaser.Physics.Arcade.Sprite {
 
   lockCell() {
     this.isLocked = true;
-    this.lock = this.scene.add.sprite(this.x, this.y, 'border-tile').setOrigin(0.5).setTint(BACKGROUND_COLOUR);// DETAIL_COLOUR); //BACKGROUND_COLOUR);// 0x404040);
+    this.lock = this.scene.add.sprite(this.x, this.y, 'border-tile').setOrigin(0.5).setTint(BACKGROUND_COLOUR);
     this.lock.displayHeight = this.displayHeight, this.lock.displayWidth = this.displayWidth;
   }
 
@@ -590,7 +551,7 @@ class GridCell extends Phaser.Physics.Arcade.Sprite {
         onComplete: function (tween) {
           this.setText('');
           this.setTint(TILE_COLOURS[0]);
-          this.setInteractive();
+          this.setInteractive({ cursor: 'pointer' });
           this.glow.destroy();
           this.isReseting = false;
         }.bind(this)
